@@ -3,7 +3,8 @@ const CACHE_NAME = "willztech-v1";
 const urlsToCache = [
   "./",
   "./index.html",
-  "./manifest.json"
+  "./manifest.json",
+  "./icon.jpg"
 ];
 
 self.addEventListener("install", event => {

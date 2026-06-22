@@ -1,7 +1,11 @@
 <!DOCTYPE html>  <html>  
 <head>  
 <meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1">  <title>WillzTech</title>  <style>  
+<meta name="viewport" content="width=device-width, initial-scale=1">  <title>WillzTech</title> 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFD700"><link rel="icon" href="icon.jpg">
+<link rel="apple-touch-icon" href="icon.jpg">
+<style>  
   
 body{  
 font-family:Arial,sans-serif;  
@@ -10,8 +14,6 @@ color:white;
 padding:15px;  
 margin:0;  
 }  
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#FFD700">
 h1{  
 color:gold;  
 text-align:center;  
@@ -1116,9 +1118,7 @@ loadSales();
 
 <script>
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js")
-    .then(() => console.log("Service Worker Registered"))
-    .catch(err => console.log("SW Error:", err));
+  navigator.serviceWorker.register("./sw.js");
 }
 </script>
 

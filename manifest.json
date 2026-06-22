@@ -1,20 +1,15 @@
 {
-  "name": "WillzTech Repair System",
-  "short_name": "WillzTech",
-  "start_url": "./index.html",
+  "name": "WillzTech",
+  "short_name": "WT",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#FFD700",
+  "background_color": "#000000",
+  "theme_color": "#005CFF",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
+      "src": "icon.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }
