@@ -1,5 +1,6 @@
-const CACHE_NAME = "willztech-v1";
+const CACHE_NAME = "willztech-cache-v3";
 
+// Files to cache
 const urlsToCache = [
   "./",
   "./index.html",
@@ -7,7 +8,10 @@ const urlsToCache = [
   "./icon.jpg"
 ];
 
+// INSTALL → cache files + activate immediately
 self.addEventListener("install", event => {
+  self.skipWaiting();
+
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -15,10 +19,30 @@ self.addEventListener("install", event => {
   );
 });
 
+// ACTIVATE → remove old caches
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    })
+  );
+
+  self.clients.claim();
+});
+
+// FETCH → always check network first (IMPORTANT CHANGE)
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then(response => {
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
