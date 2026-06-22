@@ -10,7 +10,8 @@ color:white;
 padding:15px;  
 margin:0;  
 }  
-  
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FFD700">
 h1{  
 color:gold;  
 text-align:center;  
@@ -1110,6 +1111,16 @@ updateDashboard();
 loadCustomers();
 loadInventory();
 loadSales();
-  
-</script>  </body>  
+
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js")
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.log("SW Error:", err));
+}
+</script>
+
+</body>
 </html>
