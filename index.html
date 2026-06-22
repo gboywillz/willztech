@@ -1117,11 +1117,10 @@ loadSales();
 </script>
 
 <script>
-<script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").then(reg => {
 
-    // Check for updates every time user opens app
+    // Force update check
     reg.update();
 
     reg.addEventListener("updatefound", () => {
@@ -1132,7 +1131,6 @@ if ("serviceWorker" in navigator) {
           newWorker.state === "installed" &&
           navigator.serviceWorker.controller
         ) {
-          // New version available → auto refresh
           window.location.reload();
         }
       });
@@ -1140,7 +1138,6 @@ if ("serviceWorker" in navigator) {
 
   });
 }
-</script>
 </script>
 
 </body>

@@ -2,9 +2,10 @@
   "name": "WillzTech",
   "short_name": "WillzTech",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#FFD700",
   "background_color": "#111111",
+  "theme_color": "#FFD700",
   "icons": [
     {
       "src": "icon-192.png",
