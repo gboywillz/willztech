@@ -1,0 +1,1115 @@
+<!DOCTYPE html>  <html>  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1">  <title>WillzTech</title>  <style>  
+  
+body{  
+font-family:Arial,sans-serif;  
+background:#111;  
+color:white;  
+padding:15px;  
+margin:0;  
+}  
+  
+h1{  
+color:gold;  
+text-align:center;  
+}  
+  
+h2{  
+color:gold;  
+}  
+  
+input,
+select,
+button{
+width:100%;
+padding:12px;
+margin:5px 0;
+border:none;
+border-radius:8px;
+box-sizing:border-box;
+font-size:15px;
+}
+  
+  button{
+background:gold;
+font-weight:bold;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{
+transform:scale(1.03);
+}
+  
+.card{
+background:#222;
+padding:12px;
+margin-top:10px;
+border-radius:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.3);
+transition:.2s;
+}
+  
+.section{  
+background:#1a1a1a;  
+padding:12px;  
+margin-top:15px;  
+border-radius:8px;  
+}  
+  
+.dashboard{  
+display:grid;  
+grid-template-columns:1fr 1fr;  
+gap:10px;  
+}  
+  
+.stat{  
+background:#222;  
+padding:12px;  
+border-radius:8px;  
+text-align:center;  
+}  
+#suggestions{
+  background:#222;
+  border-radius:8px;
+  margin-top:5px;
+  overflow:hidden;
+}
+
+.suggest-item{
+  padding:10px;
+  cursor:pointer;
+  border-bottom:1px solid #333;
+}
+
+.suggest-item:hover{
+  background:gold;
+  color:black;
+}  
+.stat h3{  
+margin:0;  
+color:gold;  
+}  
+  .status-Received{
+background:orange;
+color:black;
+padding:4px 8px;
+border-radius:6px;
+font-weight:bold;
+}
+
+.status-InProgress{
+background:dodgerblue;
+color:white;
+padding:4px 8px;
+border-radius:6px;
+font-weight:bold;
+}
+
+.status-Completed{
+background:green;
+color:white;
+padding:4px 8px;
+border-radius:6px;
+font-weight:bold;
+}
+
+.status-Collected{
+background:#555;
+color:white;
+padding:4px 8px;
+border-radius:6px;
+font-weight:bold;
+}
+</style>  </head>  <body>  <h1>WillzTech</h1>  <!-- DASHBOARD --> <div id="homePage"> <div class="dashboard">
+
+  <div class="stat">
+    <h3 id="totalCustomers">0</h3>
+    Customers
+  </div>
+
+  <div class="stat">
+    <h3 id="totalRepairs">0</h3>
+    Repairs
+  </div>
+
+  <div class="stat" onclick="showPendingRepairs()">
+    <h3 id="pendingRepairs">0</h3>
+    Pending
+  </div>
+
+  <div class="stat">
+    <h3 id="receivedRepairs">0</h3>
+    Received
+  </div>
+
+  <div class="stat">
+    <h3 id="completedRepairs">0</h3>
+    Completed
+  </div>
+
+  <div class="stat">
+    <h3 id="outstandingBalance">₦0</h3>
+    Outstanding
+  </div>
+
+  <div class="stat">
+    <h3 id="totalSales">₦0</h3>
+    Sales
+  </div>
+
+  <div class="stat">
+    <h3 id="totalProfit">₦0</h3>
+    Profit
+  </div>
+
+</div>
+
+<div class="section">
+
+<button onclick="openRepair()">
+🔧 Repair
+</button>
+
+<button onclick="openSales()">
+💰 Sales
+</button>
+
+</div>
+</div>
+<div id="repairSection" style="display:none;">
+  <button onclick="goHome()">⬅ Back</button>
+
+<!-- CUSTOMER SECTION -->
+<div class="section">  <h2>Add Customer</h2>  <input id="name"  
+placeholder="Customer Name">
+
+<input id="phone"  
+placeholder="Phone Number">
+
+<button onclick="saveCustomer()">  
+Save Customer  
+</button>  </div>  <!-- REPAIR SECTION -->  <div class="section">  <h2>Add Repair</h2>  <input id="repairPhone"  
+placeholder="Customer Phone">
+
+<input id="device"  
+placeholder="Device Model">
+
+<input id="fault"  
+placeholder="Fault">
+
+<input id="deposit"  
+placeholder="Deposit Paid">
+
+<input id="balance"  
+placeholder="Balance Remaining">
+
+<button onclick="addRepair()">  
+Add Repair  
+</button>  </div> <div class="section">
+
+<button onclick="openCustomersPage()">
+👥 Customers
+</button>
+
+</div>
+
+  </div>
+<div id="customersPage" style="display:none;">
+
+<div class="section">
+
+<button onclick="backToRepair()">
+⬅ Back
+</button>
+
+<h2>Customers</h2>
+
+<input id="search"
+placeholder="Search Customer..."
+onkeyup="loadCustomers()">
+
+<div id="customers"></div>
+
+<div id="profile"></div>
+
+</div>
+
+</div>
+<div id="pendingPage" style="display:none;">
+
+<div class="section">
+
+<button onclick="goHome()">
+⬅ Back
+</button>
+
+<h2>Pending Repairs</h2>
+
+<div id="pendingList"></div>
+
+</div>
+
+</div>
+<div id="salesSection" style="display:none;">
+
+<button onclick="goHome()">⬅ Back</button>
+
+<div class="section">
+<h2>Inventory</h2> <input id="productName" placeholder="Product Name">  
+<input id="category" placeholder="Category">  
+<input id="costPrice" placeholder="Cost Price">  
+<input id="sellingPrice" placeholder="Selling Price">  
+<input id="quantity" placeholder="Quantity">  
+<input id="supplier" placeholder="Supplier">  <button onclick="addInventory()">  
+Add Product  
+</button>  <div id="inventoryList"></div>  </div>  <div class="section">  <h2>Record Sale</h2>  <input id="saleProduct"
+placeholder="Product Name"
+oninput="showSuggestions(this.value)">
+
+<div id="suggestions"></div>
+
+<input id="saleQty"  
+placeholder="Quantity Sold">
+
+<button onclick="recordSale()">  
+Record Sale  
+</button>  <div id="salesList"></div>  </div>  
+</div>
+<script>  
+  function safe(text){
+  return String(text)
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+let customers =  
+JSON.parse(localStorage.getItem("customers")) || [];  
+  
+let inventory =  
+JSON.parse(localStorage.getItem("inventory")) || [];  
+  
+let sales =  
+JSON.parse(localStorage.getItem("sales")) || [];  
+  
+/* SAVE DATA */  
+  
+function saveData(){  
+  
+localStorage.setItem(  
+"customers",  
+JSON.stringify(customers)  
+);  
+  
+localStorage.setItem(  
+"inventory",  
+JSON.stringify(inventory)  
+);  
+  
+localStorage.setItem(  
+"sales",  
+JSON.stringify(sales)  
+);  
+  
+updateDashboard();  
+loadCustomers();  
+loadInventory();  
+loadSales();  
+  
+}  
+  
+/* ADD CUSTOMER */  
+  
+function saveCustomer(){  
+  
+let name =  
+document.getElementById("name").value.trim();  
+  
+let phone =
+document.getElementById("phone")
+.value
+.trim()
+.replace(/\s+/g, "");
+  
+if(!name || !phone){  
+alert("Fill all fields");  
+return;  
+}  
+  
+let existing =  
+customers.find(  
+c => c.phone === phone  
+);  
+  
+if(existing){  
+alert("Customer already exists");  
+return;  
+}  
+  
+customers.push({  
+name:name,  
+phone:phone,  
+repairs:[]  
+});  
+  
+document.getElementById("name").value="";  
+document.getElementById("phone").value="";  
+  
+saveData();  
+  
+alert("Customer Saved");  
+}  
+  function showSuggestions(value){
+
+let box = document.getElementById("suggestions");
+
+if(!value){
+  box.innerHTML = "";
+  return;
+}
+
+let filtered = inventory.filter(i =>
+  i.product.toLowerCase().includes(value.toLowerCase().trim())
+);
+
+let html = "";
+
+filtered.forEach(i => {
+html += `
+<div class="suggest-item"
+onclick='selectProduct(${JSON.stringify(i.product)})'>
+${safe(i.product)}
+</div>
+`;
+});
+
+box.innerHTML = html;
+
+}function selectProduct(name){
+
+document.getElementById("saleProduct").value = name;
+
+document.getElementById("suggestions").innerHTML = "";
+
+}
+/* ADD REPAIR */  
+  
+function addRepair(){  
+  
+let phone =  
+document.getElementById("repairPhone").value.trim();  
+  
+let device =  
+document.getElementById("device").value.trim();  
+  
+let fault =  
+document.getElementById("fault").value.trim();  
+  
+let deposit =
+Number(
+document.getElementById("deposit").value.trim()
+|| 0
+);
+
+let balance =
+Number(
+document.getElementById("balance").value.trim()
+|| 0
+);
+
+  
+if(!phone || !device || !fault){  
+alert("Fill all repair fields");  
+return;  
+}  
+  if(
+isNaN(deposit) ||
+isNaN(balance)
+){
+alert("Deposit and Balance must be numbers");
+return;
+}
+
+if(
+deposit < 0 ||
+balance < 0
+){
+alert("Amounts cannot be negative");
+return;
+}
+let customer =  
+customers.find(  
+c => c.phone === phone  
+);  
+  
+if(!customer){  
+alert("Customer not found");  
+return;  
+}  
+  
+customer.repairs.push({  
+ticket:"WT-" + Date.now(),  
+device:device,  
+fault:fault,  
+deposit:deposit || 0,  
+balance:balance || 0,  
+status:"Received",  
+date:new Date().toLocaleDateString()  
+});  
+  
+document.getElementById("repairPhone").value="";  
+document.getElementById("device").value="";  
+document.getElementById("fault").value="";  
+document.getElementById("deposit").value="";  
+document.getElementById("balance").value="";  
+  
+saveData();  
+  
+alert("Repair Added");  
+}  
+  
+/* SEARCH + CUSTOMER LIST */  
+  
+function loadCustomers(){
+
+let searchBox =
+document.getElementById("search");
+
+let search = "";
+
+if(searchBox){
+search = searchBox.value.toLowerCase();
+}
+
+let html="";
+
+customers
+.filter(c =>
+c.name.toLowerCase().includes(search)
+||
+c.phone.includes(search)
+)
+.forEach(c => {
+  
+html += `  
+<div class="card"  
+onclick="viewCustomer('${c.phone}')">  
+  
+<b>${safe(c.name)}</b><br>
+${safe(c.phone)}<br>
+  
+Repairs:  
+${c.repairs.length}  
+  
+</div>  
+`;  
+  
+});  
+  
+document.getElementById("customers")  
+.innerHTML = html;  
+  
+}  
+  
+/* VIEW CUSTOMER */  
+  
+function viewCustomer(phone){  
+  
+let customer =  
+customers.find(  
+c => c.phone === phone  
+);  
+  
+if(!customer) return;  
+  
+let repairsHtml =  
+customer.repairs.length  
+?  
+  
+customer.repairs.map(r => `  
+  
+<li>  
+  
+<b>${r.ticket}</b><br>  
+  
+${safe(r.device)}<br>
+
+Fault:
+${safe(r.fault)}<br>
+  
+Status:
+<span class="status-${r.status.replace(/\s/g,'')}">
+${r.status}
+</span><br>
+  
+Deposit:  
+₦${r.deposit}<br>  
+  
+Balance:  
+₦${r.balance}<br>  
+  
+${r.date}  
+<br><br>  
+  
+<button onclick="  
+printReceipt(  
+'${customer.phone}',  
+'${r.ticket}'  
+)  
+">  
+Receipt  
+</button>  
+  
+<br><br>  
+  
+<select onchange="
+updateStatus(
+'${customer.phone}',
+'${r.ticket}',
+this.value
+)">
+<option value="Received" ${r.status==="Received"?"selected":""}>Received</option>
+
+<option value="In Progress" ${r.status==="In Progress"?"selected":""}>In Progress</option>
+
+<option value="Completed" ${r.status==="Completed"?"selected":""}>Completed</option>
+
+<option value="Collected" ${r.status==="Collected"?"selected":""}>Collected</option>
+</select>
+<br><br>  
+  
+<button onclick="  
+deleteRepair(  
+'${customer.phone}',  
+'${r.ticket}'  
+)  
+">  
+Delete Repair  
+</button>  
+</li>  
+  
+`).join("")  
+  
+:  
+  
+"<li>No Repairs Yet</li>";  
+  
+document.getElementById("profile")  
+.innerHTML = `  
+  
+<div class="card">  
+  
+<h2>${safe(customer.name)}</h2>
+
+<button onclick="deleteCustomer('${customer.phone}')">  
+Delete Customer  
+</button>  
+
+<p>${safe(customer.phone)}</p>
+  
+<h3>Repair History</h3>  
+  
+<ul>  
+  
+${repairsHtml}  
+  
+</ul>  
+  
+</div>  
+  
+`;  
+  
+}  
+  
+/* UPDATE STATUS */  
+  
+function updateStatus(
+phone,
+ticket,
+newStatus
+){
+
+let customer =
+customers.find(
+c => c.phone === phone
+);
+
+if(!customer) return;
+
+let repair =
+customer.repairs.find(
+r => r.ticket === ticket
+);
+
+if(!repair) return;
+
+repair.status = newStatus;
+
+saveData();
+
+viewCustomer(phone);
+
+}
+function deleteCustomer(phone){  
+  
+let confirmDelete =  
+confirm("Delete this customer?");  
+  
+if(!confirmDelete) return;  
+  
+customers =  
+customers.filter(  
+c => c.phone !== phone  
+);  
+  
+saveData();  
+  
+document.getElementById(  
+"profile"  
+).innerHTML = "";  
+  
+alert("Customer Deleted");  
+  
+}  
+function deleteRepair(  
+phone,  
+ticket  
+){  
+  
+let customer =  
+customers.find(  
+c => c.phone === phone  
+);  
+  
+if(!customer) return;  
+  
+customer.repairs =  
+customer.repairs.filter(  
+r => r.ticket !== ticket  
+);  
+  
+saveData();  
+  
+viewCustomer(phone);  
+  
+alert("Repair Deleted");  
+  
+}  
+function printReceipt(  
+phone,  
+ticket  
+){  
+  
+let customer =  
+customers.find(  
+c => c.phone === phone  
+);  
+  
+if(!customer) return;  
+  
+let repair =  
+customer.repairs.find(  
+r => r.ticket === ticket  
+);  
+  
+if(!repair) return;  
+  let total =
+Number(repair.deposit || 0) +
+Number(repair.balance || 0);
+
+  let receipt = `
+📱 WILLZTECH REPAIR RECEIPT
+
+Customer: ${customer.name.trim()}
+Phone: ${customer.phone.trim()}
+
+Ticket: ${repair.ticket}
+
+Device: ${repair.device.trim()}
+Fault: ${repair.fault.trim()}
+
+Total Cost: ₦${total}
+
+Deposit: ₦${repair.deposit}
+Balance: ₦${repair.balance}
+
+Status: ${repair.status}
+Date: ${repair.date}
+
+Thank you for choosing WillzTech.
+`;
+let action =  
+prompt(  
+"Type:\n1 = Copy\n2 = WhatsApp"  
+);  
+  
+if(action === "1"){  
+  
+navigator.clipboard  
+.writeText(receipt);  
+  
+alert("Receipt Copied");  
+  
+}  
+  
+if(action === "2"){  
+  
+window.open(  
+"https://wa.me/?text=" +  
+encodeURIComponent(receipt)  
+);  
+  
+}  
+  
+}  
+/* DASHBOARD */  
+function addInventory(){  
+  
+let product =  
+document.getElementById("productName").value;  
+  
+let category =  
+document.getElementById("category").value;  
+  
+let costPrice =  
+document.getElementById("costPrice").value;  
+  
+let sellingPrice =  
+document.getElementById("sellingPrice").value;  
+  
+let quantity =  
+document.getElementById("quantity").value;  
+  
+let supplier =  
+document.getElementById("supplier").value;  
+  
+if(!product || !quantity){
+  alert("Fill product details");
+  return;
+}
+
+let existingProduct =
+inventory.find(
+i => i.product.toLowerCase() === product.toLowerCase()
+);
+
+if(existingProduct){
+  alert("Product already exists");
+  return;
+}
+  
+inventory.push({  
+product,  
+category,  
+costPrice,  
+sellingPrice,  
+quantity: Number(quantity),
+supplier  
+});  
+  document.getElementById("productName").value = "";
+document.getElementById("category").value = "";
+document.getElementById("costPrice").value = "";
+document.getElementById("sellingPrice").value = "";
+document.getElementById("quantity").value = "";
+document.getElementById("supplier").value = "";
+saveData();  
+  
+alert("Product Added");  
+}  
+  
+function loadInventory(){  
+  
+let html = "";  
+  
+inventory.forEach(item => {  
+  
+html += `  
+<div class="card">  
+  
+<b>${safe(item.product)}</b><br>
+
+Category: ${safe(item.category)}</br>
+  
+Stock: ${item.quantity}<br>  
+  
+Selling Price: ₦${item.sellingPrice}  
+  
+</div>  
+`;  
+  
+});  
+  
+document.getElementById(  
+"inventoryList"  
+).innerHTML = html;  
+  
+}  
+function recordSale(){  
+  
+let product =  
+document.getElementById("saleProduct").value;  
+  
+let qty =  
+Number(  
+document.getElementById("saleQty").value  
+);  
+  
+let item = inventory.find(
+i => i.product.toLowerCase().includes(product.toLowerCase().trim())
+);
+  
+if(!item){  
+alert("Product not found");  
+return;  
+}  
+  
+if(qty > Number(item.quantity)){  
+alert("Not enough stock");  
+return;  
+}  
+  
+  if(qty <= 0){
+  alert("Invalid quantity");
+  return;
+}
+item.quantity =  
+Number(item.quantity) - qty;  
+
+if(item.quantity <= 5){
+  alert("Warning: Low stock on " + item.product);
+}
+  
+let cp = Number(item.costPrice || 0);
+let sp = Number(item.sellingPrice || 0);
+
+let amount = qty * sp;
+let profit = qty * (sp - cp);
+  
+sales.push({  
+product,  
+qty,  
+amount,  
+profit,  
+date:new Date().toLocaleDateString()  
+});  
+  document.getElementById("saleProduct").value = "";
+document.getElementById("saleQty").value = "";
+saveData();  
+  
+alert("Sale Recorded");  
+}  
+  
+function loadSales(){  
+  
+let html = "";  
+  
+sales.forEach(s => {  
+  
+html += `  
+<div class="card">  
+  
+<b>${s.product}</b><br>  
+  
+Quantity: ${s.qty}<br>  
+  
+Amount: ₦${s.amount}<br>  
+  
+Profit: ₦${s.profit}  
+  
+</div>  
+`;  
+  
+});  
+  
+document.getElementById(  
+"salesList"  
+).innerHTML = html;  
+  
+}  
+function updateDashboard(){
+
+let totalCustomers = customers.length;
+
+let totalRepairs = 0;
+let pending = 0;
+let received = 0;
+let inProgress = 0;
+let completed = 0;
+let balance = 0;
+
+let totalSales = 0;
+let totalProfit = 0;
+
+/* SALES */
+sales.forEach(s => {
+  totalSales += Number(s.amount || 0);
+  totalProfit += Number(s.profit || 0);
+});
+
+/* REPAIRS */
+customers.forEach(c => {
+  (c.repairs || []).forEach(r => {
+
+    totalRepairs++;
+
+    if (r.status === "Received") {
+      received++;
+      pending++;
+    }
+
+    else if (r.status === "In Progress") {
+      inProgress++;
+      pending++;
+    }
+
+    else if (r.status === "Completed") {
+      completed++;
+    }
+
+    else if (r.status === "Collected") {
+      completed++;
+    }
+
+    if (r.status !== "Collected") {
+      balance += Number(r.balance || 0);
+    }
+
+  });
+});
+
+/* UI UPDATE */
+document.getElementById("totalCustomers").innerText = totalCustomers;
+document.getElementById("totalRepairs").innerText = totalRepairs;
+
+document.getElementById("pendingRepairs").innerText = pending;
+document.getElementById("receivedRepairs").innerText = received;
+document.getElementById("completedRepairs").innerText = completed;
+
+document.getElementById("outstandingBalance").innerText =
+"₦" + balance.toLocaleString();
+
+document.getElementById("totalSales").innerText =
+"₦" + totalSales.toLocaleString();
+
+document.getElementById("totalProfit").innerText =
+"₦" + totalProfit.toLocaleString();
+
+}
+  
+/* SHOW / HIDE CUSTOMERS */  
+  
+function toggleCustomers(){  
+  
+let div =  
+document.getElementById("customers");  
+  
+if(div.style.display === "none"){  
+div.style.display = "block";  
+}else{  
+div.style.display = "none";  
+}  
+  
+}  
+function openRepair(){
+
+document.getElementById("homePage").style.display = "none";
+
+document.getElementById("repairSection").style.display = "block";
+
+document.getElementById("salesSection").style.display = "none";
+
+}
+
+function openSales(){
+
+document.getElementById("homePage").style.display = "none";
+
+document.getElementById("repairSection").style.display = "none";
+
+document.getElementById("salesSection").style.display = "block";
+
+}
+
+function goHome(){
+
+document.getElementById("homePage").style.display = "block";
+
+document.getElementById("repairSection").style.display = "none";
+
+document.getElementById("salesSection").style.display = "none";
+
+document.getElementById("customersPage").style.display = "none";
+
+document.getElementById("pendingPage").style.display = "none";
+
+}
+function openCustomersPage(){
+
+document.getElementById("repairSection").style.display = "none";
+
+document.getElementById("customersPage").style.display = "block";
+
+loadCustomers();
+
+}
+
+function backToRepair(){
+
+document.getElementById("customersPage").style.display = "none";
+
+document.getElementById("repairSection").style.display = "block";
+
+}
+function showPendingRepairs(){
+
+document.getElementById("homePage").style.display = "none";
+
+document.getElementById("pendingPage").style.display = "block";
+
+let html = "";
+
+customers.forEach(c => {
+
+(c.repairs || []).forEach(r => {
+
+if(
+r.status !== "Completed" &&
+r.status !== "Collected"
+){
+
+html += `
+<div class="card">
+
+<b>${safe(c.name)}</b><br>
+
+${safe(c.phone)}<br>
+
+Ticket: ${r.ticket}<br>
+
+Device: ${safe(r.device)}<br>
+
+Status: ${r.status}
+
+</div>
+`;
+
+}
+
+});
+
+});
+
+document.getElementById("pendingList").innerHTML =
+html || "<div class='card'>No Pending Repairs</div>";
+
+}
+/* START APP */  
+  
+updateDashboard();
+loadCustomers();
+loadInventory();
+loadSales();
+  
+</script>  </body>  
+</html>
