@@ -39,10 +39,6 @@ self.addEventListener("activate", event => {
 // FETCH → always check network first (IMPORTANT CHANGE)
 self.addEventListener("fetch", event => {
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
