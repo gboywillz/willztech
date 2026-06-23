@@ -1,8 +1,8 @@
 {
   "name": "WillzTech",
-  "short_name": "WillzTech",
+  "short_name": "WT",
   "start_url": "./",
-"scope": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#111111",
   "theme_color": "#FFD700",

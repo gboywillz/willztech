@@ -1,11 +1,13 @@
-const CACHE_NAME = "willztech-cache-v3";
+const CACHE_NAME = "willztech-cache-v4";
 
 // Files to cache
 const urlsToCache = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./icon.jpg"
+  "./icon.jpg",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 // INSTALL → cache files + activate immediately
