@@ -1,4 +1,4 @@
-const CACHE_NAME = "willztech-cache-v5";
+const CACHE_NAME = "willztech-cache-v6";
 
 // Files to cache
 const urlsToCache = [
