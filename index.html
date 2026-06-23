@@ -429,8 +429,8 @@ async function saveCustomer(){
 
   try{
 
-    await addDoc(
-      collection(db,"customers"),
+    await window.addDoc(
+  window.collection(window.db,"customers"),
       {
         name:name,
         phone:phone,
@@ -1221,14 +1221,6 @@ import {
   getFirestore,
   collection,
   addDoc,
-  getDocs
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
   getDocs,
   deleteDoc,
   doc,
@@ -1247,6 +1239,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+window.db = db;
+window.addDoc = addDoc;
+window.collection = collection;
 async function loadCustomersFromFirebase(){
 
   customers = [];
