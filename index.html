@@ -412,47 +412,46 @@ loadSales();
 /* ADD CUSTOMER */  
   
 async function saveCustomer(){
-  
-let name =  
-document.getElementById("name").value.trim();  
-  
-let phone =
-document.getElementById("phone")
-.value
-.trim()
-.replace(/\s+/g, "");
-  
-if(!name || !phone){  
-alert("Fill all fields");  
-return;  
-}  
-  
-let existing =  
-customers.find(  
-c => c.phone === phone  
-);  
-  
-if(existing){  
-alert("Customer already exists");  
-return;  
-}  
-  
-await addDoc(
-  collection(db,"customers"),
-  {
-    name:name,
-    phone:phone,
-    repairs:[]
+
+  let name =
+  document.getElementById("name").value.trim();
+
+  let phone =
+  document.getElementById("phone")
+  .value
+  .trim()
+  .replace(/\s+/g, "");
+
+  if(!name || !phone){
+    alert("Fill all fields");
+    return;
   }
-);
-  
-document.getElementById("name").value="";  
-document.getElementById("phone").value="";  
-  
-loadCustomersFromFirebase();
-  
-alert("Customer Saved");  
-}  
+
+  try{
+
+    await addDoc(
+      collection(db,"customers"),
+      {
+        name:name,
+        phone:phone,
+        repairs:[]
+      }
+    );
+
+    document.getElementById("name").value = "";
+    document.getElementById("phone").value = "";
+
+    alert("Customer Saved");
+
+    loadCustomersFromFirebase();
+
+  }catch(error){
+
+    alert(error.message);
+
+  }
+
+}
   function showSuggestions(value){
 
 let box = document.getElementById("suggestions");
@@ -1217,6 +1216,15 @@ import {
   signOut
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore,
   collection,
@@ -1239,6 +1247,23 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+async function loadCustomersFromFirebase(){
+
+  customers = [];
+
+  const querySnapshot =
+  await getDocs(
+    collection(db,"customers")
+  );
+
+  querySnapshot.forEach(doc => {
+    customers.push(doc.data());
+  });
+
+  loadCustomers();
+  updateDashboard();
+
+}
 
 window.loginUser = async function(){
 
