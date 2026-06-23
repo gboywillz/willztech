@@ -349,7 +349,7 @@ placeholder="Quantity Sold">
 Record Sale  
 </button>  <div id="salesList"></div>  </div>  
 </div>
-<script>  
+<script>
   function safe(text){
   return String(text)
     .replace(/</g, "&lt;")
@@ -360,26 +360,6 @@ let inventory = [];
 let sales = [];
   
 /* SAVE DATA */  
-  async function loadCustomersFromFirebase(){
-
-  customers = [];
-
-  const querySnapshot =
-  await getDocs(collection(db, "customers"));
-
-  querySnapshot.forEach(docSnap => {
-
-    customers.push({
-      id: docSnap.id,
-      ...docSnap.data()
-    });
-
-  });
-
-  loadCustomers();
-  updateDashboard();
-
-}
 function saveData(){  
   
 localStorage.setItem(  
@@ -398,29 +378,20 @@ JSON.stringify(sales)
 );  
   
 /* START APP */
-
-document.getElementById("topBar").style.display = "block";
-document.getElementById("homePage").style.display = "block";
-
 updateDashboard();
 loadCustomers();
 loadInventory();
 loadSales();
-  
 }  
   
-/* ADD CUSTOMER */  
-  
+/* ADD CUSTOMER */
 async function saveCustomer(){
 
   let name =
   document.getElementById("name").value.trim();
 
   let phone =
-  document.getElementById("phone")
-  .value
-  .trim()
-  .replace(/\s+/g, "");
+  document.getElementById("phone").value.trim();
 
   if(!name || !phone){
     alert("Fill all fields");
@@ -429,8 +400,10 @@ async function saveCustomer(){
 
   try{
 
-    await window.addDoc(
-  window.collection(window.db,"customers"),
+    alert("Saving...");
+
+    const docRef = await window.addDoc(
+      window.collection(window.db,"customers"),
       {
         name:name,
         phone:phone,
@@ -438,20 +411,22 @@ async function saveCustomer(){
       }
     );
 
-    document.getElementById("name").value = "";
-    document.getElementById("phone").value = "";
-
-    alert("Customer Saved");
-
-    loadCustomersFromFirebase();
+    alert("SUCCESS\nID: " + docRef.id);
 
   }catch(error){
 
-    alert(error.message);
+    alert(
+      "ERROR\n\n" +
+      error.code +
+      "\n\n" +
+      error.message
+    );
 
+    console.error(error);
   }
 
 }
+
   function showSuggestions(value){
 
 let box = document.getElementById("suggestions");
@@ -1196,12 +1171,12 @@ document.getElementById("pendingList").innerHTML =
 html || "<div class='card'>No Pending Repairs</div>";
 
 }
-/* START APP */  
-  
-updateDashboard();
-loadCustomers();
-loadInventory();
-loadSales();
+/* START APP */
+
+// updateDashboard();
+// loadCustomers();
+// loadInventory();
+// loadSales();
 
 </script>
 <script type="module">
@@ -1239,27 +1214,36 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-window.db = db;
-window.addDoc = addDoc;
-window.collection = collection;
 async function loadCustomersFromFirebase(){
 
   customers = [];
 
   const querySnapshot =
-  await getDocs(
-    collection(db,"customers")
-  );
+  await getDocs(collection(db,"customers"));
 
-  querySnapshot.forEach(doc => {
-    customers.push(doc.data());
+  querySnapshot.forEach(docSnap => {
+
+    customers.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+
   });
-
+console.log("Customers loaded:", customers);
+alert("Loaded: " + customers.length + " customers");
   loadCustomers();
   updateDashboard();
 
 }
+window.db = db;
+window.addDoc = addDoc;
+window.collection = collection;
 
+window.updateDoc = updateDoc;
+window.deleteDoc = deleteDoc;
+window.doc = doc;
+window.loadCustomersFromFirebase =
+loadCustomersFromFirebase;
 window.loginUser = async function(){
 
   const email =
