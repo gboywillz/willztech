@@ -397,21 +397,33 @@ async function saveCustomer(){
     alert("Fill all fields");
     return;
   }
+const existing = customers.find(
+  c => c.phone === phone
+);
 
+if(existing){
+  alert("Customer already exists");
+  return;
+}
   try{
 
     alert("Saving...");
 
-    const docRef = await window.addDoc(
-      window.collection(window.db,"customers"),
-      {
-        name:name,
-        phone:phone,
-        repairs:[]
-      }
-    );
+const docRef = await window.addDoc(
+  window.collection(window.db,"customers"),
+  {
+    name:name,
+    phone:phone,
+    repairs:[]
+  }
+);
 
-    alert("SUCCESS\nID: " + docRef.id);
+alert("SUCCESS\nID: " + docRef.id);
+
+document.getElementById("name").value = "";
+document.getElementById("phone").value = "";
+
+await window.loadCustomersFromFirebase();
 
   }catch(error){
 
