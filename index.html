@@ -393,52 +393,46 @@ async function saveCustomer(){
   let phone =
   document.getElementById("phone").value.trim();
 
-  if(!name || !phone){
-    alert("Fill all fields");
-    return;
-  }
-const existing = customers.find(
-  c => c.phone === phone
-);
-
-if(existing){
-  alert("Customer already exists");
-  return;
-}
   try{
 
-    alert("Saving...");
+    console.log("Starting save...");
 
-const docRef = await window.addDoc(
-  window.collection(window.db,"customers"),
-  {
-    name:name,
-    phone:phone,
-    repairs:[]
-  }
-);
+    const timeout = new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error("Firestore Timeout")),
+        10000
+      )
+    );
 
-alert("SUCCESS\nID: " + docRef.id);
+    const write = window.addDoc(
+      window.collection(window.db,"customers"),
+      {
+        name,
+        phone,
+        repairs:[]
+      }
+    );
 
-document.getElementById("name").value = "";
-document.getElementById("phone").value = "";
+    const docRef =
+    await Promise.race([write, timeout]);
 
-await window.loadCustomersFromFirebase();
+    console.log("SUCCESS", docRef.id);
+
+    alert("Saved");
 
   }catch(error){
 
+    console.error(error);
+
     alert(
-      "ERROR\n\n" +
-      error.code +
-      "\n\n" +
-      error.message
+      error.message ||
+      error.code ||
+      "Unknown Error"
     );
 
-    console.error(error);
   }
 
 }
-
   function showSuggestions(value){
 
 let box = document.getElementById("suggestions");
@@ -1205,13 +1199,14 @@ import {
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
-  getFirestore,
+  initializeFirestore,
   collection,
   addDoc,
   getDocs,
   deleteDoc,
   doc,
-  updateDoc
+  updateDoc,
+  onSnapshot
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = {
@@ -1225,26 +1220,42 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-async function loadCustomersFromFirebase(){
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  useFetchStreams: false
+});
+function loadCustomersFromFirebase(){
 
-  customers = [];
+  onSnapshot(
+    collection(db,"customers"),
+    snapshot => {
 
-  const querySnapshot =
-  await getDocs(collection(db,"customers"));
+      customers = [];
 
-  querySnapshot.forEach(docSnap => {
+      snapshot.forEach(docSnap => {
 
-    customers.push({
-      id: docSnap.id,
-      ...docSnap.data()
-    });
+        customers.push({
+          id: docSnap.id,
+          ...docSnap.data()
+        });
 
-  });
-console.log("Customers loaded:", customers);
-alert("Loaded: " + customers.length + " customers");
-  loadCustomers();
-  updateDashboard();
+      });
+
+      loadCustomers();
+      updateDashboard();
+
+    },
+    error => {
+
+      console.error(error);
+
+      alert(
+        "Firestore Error:\n" +
+        error.message
+      );
+
+    }
+  );
 
 }
 window.db = db;
