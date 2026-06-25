@@ -356,6 +356,7 @@ Record Sale
     .replace(/>/g, "&gt;");
 }
 let customers = [];
+let repairs = [];
 let inventory = [];
 let sales = [];
   
@@ -387,6 +388,8 @@ loadSales();
 /* ADD CUSTOMER */
 async function saveCustomer(){
 
+  alert("saveCustomer started");
+
   let name =
   document.getElementById("name").value.trim();
 
@@ -396,41 +399,30 @@ async function saveCustomer(){
   try{
 
     console.log("Starting save...");
-
-    const timeout = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("Firestore Timeout")),
-        10000
-      )
-    );
-
-    const write = window.addDoc(
-      window.collection(window.db,"customers"),
-      {
-        name,
-        phone,
-        repairs:[]
-      }
-    );
-
-    const docRef =
-    await Promise.race([write, timeout]);
-
+alert("About to save to Firestore");
+    const docRef = await window.addDoc(
+  window.collection(window.db,"customers"),
+  {
+    name,
+    phone,
+    repairs:[]
+  }
+);
+alert("Firestore save finished");
     console.log("SUCCESS", docRef.id);
 
     alert("Saved");
 
   }catch(error){
 
-    console.error(error);
+  console.error("SAVE ERROR:", error);
 
-    alert(
-      error.message ||
-      error.code ||
-      "Unknown Error"
-    );
+  alert(
+    "CODE: " + error.code +
+    "\nMESSAGE: " + error.message
+  );
 
-  }
+}
 
 }
   function showSuggestions(value){
@@ -468,17 +460,17 @@ document.getElementById("suggestions").innerHTML = "";
 }
 /* ADD REPAIR */  
   
-function addRepair(){  
-  
-let phone =  
-document.getElementById("repairPhone").value.trim();  
-  
-let device =  
-document.getElementById("device").value.trim();  
-  
-let fault =  
-document.getElementById("fault").value.trim();  
-  
+async function addRepair(){
+
+let phone =
+document.getElementById("repairPhone").value.trim();
+alert("Got name and phone");
+let device =
+document.getElementById("device").value.trim();
+
+let fault =
+document.getElementById("fault").value.trim();
+
 let deposit =
 Number(
 document.getElementById("deposit").value.trim()
@@ -491,57 +483,55 @@ document.getElementById("balance").value.trim()
 || 0
 );
 
-  
-if(!phone || !device || !fault){  
-alert("Fill all repair fields");  
-return;  
-}  
-  if(
-isNaN(deposit) ||
-isNaN(balance)
-){
-alert("Deposit and Balance must be numbers");
+if(!phone || !device || !fault){
+alert("Fill all repair fields");
 return;
 }
 
-if(
-deposit < 0 ||
-balance < 0
-){
-alert("Amounts cannot be negative");
+let customer =
+customers.find(
+c => c.phone === phone
+);
+
+if(!customer){
+alert("Customer not found");
 return;
 }
-let customer =  
-customers.find(  
-c => c.phone === phone  
-);  
-  
-if(!customer){  
-alert("Customer not found");  
-return;  
-}  
-  
-customer.repairs.push({  
-ticket:"WT-" + Date.now(),  
-device:device,  
-fault:fault,  
-deposit:deposit || 0,  
-balance:balance || 0,  
-status:"Received",  
-date:new Date().toLocaleDateString()  
-});  
-  
-document.getElementById("repairPhone").value="";  
-document.getElementById("device").value="";  
-document.getElementById("fault").value="";  
-document.getElementById("deposit").value="";  
-document.getElementById("balance").value="";  
-  
-saveData();  
-  
-alert("Repair Added");  
-}  
-  
+
+try{
+
+await addDoc(
+collection(db,"repairs"),
+{
+customerPhone: customer.phone,
+customerName: customer.name,
+ticket: "WT-" + Date.now(),
+device,
+fault,
+deposit,
+balance,
+status: "Received",
+date: new Date().toLocaleDateString()
+}
+);
+
+document.getElementById("repairPhone").value="";
+document.getElementById("device").value="";
+document.getElementById("fault").value="";
+document.getElementById("deposit").value="";
+document.getElementById("balance").value="";
+
+alert("Repair Added");
+
+}catch(error){
+
+alert(error.message);
+
+}
+
+}
+
+ 
 /* SEARCH + CUSTOMER LIST */  
   
 function loadCustomers(){
@@ -596,77 +586,52 @@ c => c.phone === phone
   
 if(!customer) return;  
   
-let repairsHtml =  
-customer.repairs.length  
-?  
-  
-customer.repairs.map(r => `  
-  
-<li>  
-  
-<b>${r.ticket}</b><br>  
-  
+let customerRepairs =
+repairs.filter(
+r => r.customerPhone === phone
+);
+
+let repairsHtml =
+customerRepairs.length
+?
+
+customerRepairs.map(r => `
+
+<li>
+
+<b>${r.ticket}</b><br>
+
 ${safe(r.device)}<br>
 
 Fault:
 ${safe(r.fault)}<br>
-  
+
 Status:
 <span class="status-${r.status.replace(/\s/g,'')}">
 ${r.status}
 </span><br>
-  
-Deposit:  
-₦${r.deposit}<br>  
-  
-Balance:  
-₦${r.balance}<br>  
-  
-${r.date}  
-<br><br>  
-  
-<button onclick="  
-printReceipt(  
-'${customer.phone}',  
-'${r.ticket}'  
-)  
-">  
-Receipt  
-</button>  
-  
-<br><br>  
-  
-<select onchange="
-updateStatus(
-'${customer.phone}',
-'${r.ticket}',
-this.value
-)">
-<option value="Received" ${r.status==="Received"?"selected":""}>Received</option>
 
-<option value="In Progress" ${r.status==="In Progress"?"selected":""}>In Progress</option>
+Deposit:
+₦${r.deposit}<br>
 
-<option value="Completed" ${r.status==="Completed"?"selected":""}>Completed</option>
+Balance:
+₦${r.balance}<br>
 
-<option value="Collected" ${r.status==="Collected"?"selected":""}>Collected</option>
-</select>
-<br><br>  
-  
-<button onclick="  
-deleteRepair(  
-'${customer.phone}',  
-'${r.ticket}'  
-)  
-">  
-Delete Repair  
-</button>  
-</li>  
-  
-`).join("")  
-  
-:  
-  
-"<li>No Repairs Yet</li>";  
+${r.date}
+
+<br><br>
+
+Receipt
+
+<br><br>
+
+</li>
+
+`).join("")
+
+:
+
+"<li>No Repairs Yet</li>";
   
 document.getElementById("profile")  
 .innerHTML = `  
@@ -697,31 +662,35 @@ ${repairsHtml}
   
 /* UPDATE STATUS */  
   
-function updateStatus(
+async function updateStatus(
 phone,
 ticket,
 newStatus
 ){
 
-let customer =
-customers.find(
-c => c.phone === phone
-);
-
-if(!customer) return;
-
 let repair =
-customer.repairs.find(
+repairs.find(
 r => r.ticket === ticket
 );
 
 if(!repair) return;
 
-repair.status = newStatus;
+try{
 
-saveData();
+await updateDoc(
+doc(db,"repairs",repair.id),
+{
+status:newStatus
+}
+);
 
-viewCustomer(phone);
+alert("Status Updated");
+
+}catch(error){
+
+alert(error.message);
+
+}
 
 }
 function deleteCustomer(phone){  
@@ -745,30 +714,42 @@ document.getElementById(
 alert("Customer Deleted");  
   
 }  
-function deleteRepair(  
-phone,  
-ticket  
-){  
-  
-let customer =  
-customers.find(  
-c => c.phone === phone  
-);  
-  
-if(!customer) return;  
-  
-customer.repairs =  
-customer.repairs.filter(  
-r => r.ticket !== ticket  
-);  
-  
-saveData();  
-  
-viewCustomer(phone);  
-  
-alert("Repair Deleted");  
-  
-}  
+async function deleteRepair(
+phone,
+ticket
+){
+
+let repair =
+repairs.find(
+r => r.ticket === ticket
+);
+
+if(!repair) return;
+
+let confirmDelete =
+confirm("Delete this repair?");
+
+if(!confirmDelete) return;
+
+try{
+
+await deleteDoc(
+doc(
+db,
+"repairs",
+repair.id
+)
+);
+
+alert("Repair Deleted");
+
+}catch(error){
+
+alert(error.message);
+
+}
+
+}
 function printReceipt(  
 phone,  
 ticket  
@@ -1021,34 +1002,32 @@ sales.forEach(s => {
 });
 
 /* REPAIRS */
-customers.forEach(c => {
-  (c.repairs || []).forEach(r => {
+/* REPAIRS */
+repairs.forEach(r => {
 
-    totalRepairs++;
+  totalRepairs++;
 
-    if (r.status === "Received") {
-      received++;
-      pending++;
-    }
+  if (r.status === "Received") {
+    received++;
+    pending++;
+  }
 
-    else if (r.status === "In Progress") {
-      inProgress++;
-      pending++;
-    }
+  else if (r.status === "In Progress") {
+    pending++;
+  }
 
-    else if (r.status === "Completed") {
-      completed++;
-    }
+  else if (r.status === "Completed") {
+    completed++;
+  }
 
-    else if (r.status === "Collected") {
-      completed++;
-    }
+  else if (r.status === "Collected") {
+    completed++;
+  }
 
-    if (r.status !== "Collected") {
-      balance += Number(r.balance || 0);
-    }
+  if (r.status !== "Collected") {
+    balance += Number(r.balance || 0);
+  }
 
-  });
 });
 
 /* UI UPDATE */
@@ -1142,9 +1121,7 @@ document.getElementById("pendingPage").style.display = "block";
 
 let html = "";
 
-customers.forEach(c => {
-
-(c.repairs || []).forEach(r => {
+repairs.forEach(r => {
 
 if(
 r.status !== "Completed" &&
@@ -1154,9 +1131,9 @@ r.status !== "Collected"
 html += `
 <div class="card">
 
-<b>${safe(c.name)}</b><br>
+<b>${safe(r.customerName)}</b><br>
 
-${safe(c.phone)}<br>
+${safe(r.customerPhone)}</br>
 
 Ticket: ${r.ticket}<br>
 
@@ -1168,8 +1145,6 @@ Status: ${r.status}
 `;
 
 }
-
-});
 
 });
 
@@ -1206,7 +1181,9 @@ import {
   deleteDoc,
   doc,
   updateDoc,
-  onSnapshot
+  onSnapshot,
+  query,
+  where
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig = {
@@ -1223,6 +1200,7 @@ const auth = getAuth(app);
 const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
   useFetchStreams: false
+});
 });
 function loadCustomersFromFirebase(){
 
@@ -1253,6 +1231,29 @@ function loadCustomersFromFirebase(){
         "Firestore Error:\n" +
         error.message
       );
+
+    }
+  );
+
+}
+function loadRepairsFromFirebase(){
+
+  onSnapshot(
+    collection(db,"repairs"),
+    snapshot => {
+
+      repairs = [];
+
+      snapshot.forEach(docSnap => {
+
+        repairs.push({
+          id: docSnap.id,
+          ...docSnap.data()
+        });
+
+      });
+
+      updateDashboard();
 
     }
   );
@@ -1293,8 +1294,10 @@ window.loginUser = async function(){
 
 onAuthStateChanged(auth, user => {
 
-  if(user){
+if(user){
+
     loadCustomersFromFirebase();
+    loadRepairsFromFirebase();
 document.getElementById("topBar").style.display = "block";
     document.getElementById("loginPage")
     .style.display = "none";
